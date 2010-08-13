@@ -29,25 +29,6 @@ See http://delsolr.rubyforge.org for more info
 Example:
 
     c = DelSolr::Client.new(:server => 'solr1', :port => 8983)
-    rsp = c.query('dismax', :query => 'mp3 player',
-                            :filters => {:cost => (50..100)},
-                            :facets => [{:field => 'brand', :limit => 10},
-                                        {:query => {:onsale => true, :brand => 'Apple'},
-                                         :name => 'cheap_apple'}])
-
-    # output total matches
-    puts rsp.total
-
-    # output each id with score
-    rsp.docs.each { |doc| puts "#{doc[:id]} - #{doc[:score]}" }
-
-    # output each value for a facet
-    rsp.facet_field_values('brand').each do |brand|
-      puts "#{brand}: #{rsp.facet_field_count('brand', brand}"
-    end
-
-    # output a query facet
-    puts "Cheap Apple stuff: #{rsp.facet_query_count_by_name('cheap_apple')}"
 
     # adding things
     doc = DelSolr::Document.new
@@ -59,6 +40,28 @@ Example:
 
     rsp = c.query('dismax', :query => 'shuffle mp3 player')
     puts rsp.ids[0]
+
+    # query for things
+    rsp = c.query('dismax', :query => 'mp3 player',
+                            :filters => {:cost => (50..100)},
+                            :facets => [{:field => 'brand', :limit => 10},
+                                        {:query => {:onsale => true, :brand => 'Apple'},
+                                         :name => 'cheap_apple'}])
+
+    # output total matches
+    puts rsp.total
+
+    # output each id with score
+    rsp.docs.each { |doc| puts "#{doc['id']} - #{doc['score']}" }
+
+    # output each value for a facet
+    rsp.facet_field_values('brand').each do |brand|
+      puts "#{brand}: #{rsp.facet_field_count('brand', brand}"
+    end
+
+    # output a query facet
+    puts "Cheap Apple stuff: #{rsp.facet_query_count_by_name('cheap_apple')}"
+
 
 
 == REQUIREMENTS:

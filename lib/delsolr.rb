@@ -210,12 +210,13 @@ module DelSolr
       h,b = post("<delete><id>#{unique_id}</id></delete>")
       success?(b)
     end
-    
-    # not implemented
+        
+    # delete all documents matching query
     def delete_by_query(query)
-      raise 'not implemented yet :('
+      h,b = post("<delete><query>#{query}</query></delete>")
+      success?(b)
     end
-    
+        
     # commits all pending adds/deletes
     def commit!
       h,b = post("<commit/>")
@@ -248,6 +249,12 @@ module DelSolr
       @pending_documents ||= []
     end
     
+    # Clear the entire index
+    def delete_all_documents!
+      delete_by_query("*:*")
+      commit!
+    end
+    
     private
     
     # returns the update xml buffer
@@ -266,7 +273,15 @@ module DelSolr
     end
     
     def success?(response_body)
-      response_body == '<result status="0"></result>'
+      # <?xml version="1.0" encoding="UTF-8"?>
+      # <response>
+      # <lst name="responseHeader"><int name="status">0</int><int name="QTime">0</int></lst>
+      # </response>
+      success = response_body.include? '<int name="status">0</int>'
+      unless success
+        puts response_body
+      end
+      success
     end
     
   end
